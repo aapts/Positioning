@@ -41,5 +41,5 @@ function plotspace(beacon,roverInitPosition)
     title('Initial Space')
     xlabel('X axis');
     ylabel('Y axis')
+    hold off
 end
-
