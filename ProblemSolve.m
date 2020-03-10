@@ -1,22 +1,37 @@
+clear 
+close all 
 ProblemInit;
 
-plotSpace(beacon, roverInitPosition);
 distNoise = addnoise(distToRover, space, 100);
 
-syms xi phi 
+syms chi phi 
 for i = 1:params.anchorQuantity
-    circle(i,1) = (beacon(i,1)-xi)^2 + (beacon(i,2)-phi)^2 == distToRover(i)^2;
-    hold on 
-    fplot(circle(i,1));
+    rad(i) = (beacon(i,1)-chi)^2 + (beacon(i,2)-phi)^2 == distToRover(i)^2;
 end
-function plotSpace(beacons,rover)
+
+plotSpace(beacon, rad, roverInitPosition,space);
+solut = zeros(numel(rad));
+
+for i = 1:numel(rad)
+  if i<numel(rad)
+    for j = i:numel(rad)
+        slv = solve([rad(i) rad(j)],[phi chi]);
+        solut(i,1) = double(slv.chi);
+        solut(i,2) = double(slv.phi);
+    end    
+  else
+  end
+end
+    
+function plotSpace(beacons,circles,rover,space)
     scatter(beacons(:,1),beacons(:,2),'x','magenta');
     hold on
     scatter(rover.x,rover.y,...
           'diamond','black','filled');
     title('Initial Space')
-    xlabel('X axis');
-    ylabel('Y axis')
+    xlabel('\chi');
+    ylabel('\phi')
+    fimplicit(circles(:), [min(space.x) max(space.x)]);
     hold off
 end
 

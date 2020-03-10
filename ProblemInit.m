@@ -1,10 +1,10 @@
-params.anchorQuantity = 150;
+params.anchorQuantity = 5;
 params.problemDim = 2;
 params.spaceFineness = 1500;
 
-space.x = linspace(0, 10, params.spaceFineness);
-space.y = linspace(0, 10, params.spaceFineness);
-space.z = linspace(0, 10, params.spaceFineness);
+space.x = linspace(-10, 10, params.spaceFineness);
+space.y = linspace(-10, 10, params.spaceFineness);
+space.z = linspace(-10, 10, params.spaceFineness);
 
 roverInitPosition.x = space.x(randi(size(space.x)));
 roverInitPosition.y = space.y(randi(size(space.y)));
