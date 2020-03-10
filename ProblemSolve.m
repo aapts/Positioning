@@ -5,9 +5,9 @@ distNoise = addnoise(distToRover, space, 100);
 
 syms xi phi 
 for i = 1:params.anchorQuantity
-    circle(i) = (beacon(i,1)-xi)^2 + (beacon(i,2)-phi)^2 == distToRover(i)^2;
+    circle(i,1) = (beacon(i,1)-xi)^2 + (beacon(i,2)-phi)^2 == distToRover(i)^2;
     hold on 
-    ezplot(circle(i));
+    fplot(circle(i,1));
 end
 function plotSpace(beacons,rover)
     scatter(beacons(:,1),beacons(:,2),'x','magenta');
