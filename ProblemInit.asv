@@ -1,5 +1,5 @@
 params.anchorQuantity = 150;
-params.problemDim = 3;
+params.problemDim = 2;
 params.spaceFineness = 1500;
 
 space.x = linspace(0, 10, params.spaceFineness);
@@ -9,8 +9,9 @@ space.z = linspace(0, 10, params.spaceFineness);
 roverInitPosition.x = space.x(randi(size(space.x)));
 roverInitPosition.y = space.y(randi(size(space.y)));
 roverInitPosition.z = space.z(randi(size(space.z)));
-
+distToRover = zeros(params.anchorQuantity,1);
 beacon = zeros(params.anchorQuantity,params.problemDim);
+
 if params.problemDim == 2
     for i = 1:params.anchorQuantity
         beacon(i,1) = space.x(randi(size(space.x)));
@@ -29,17 +30,20 @@ elseif params.problemDim == 3
 else error('Error. Set the dimension of a problem at 2 or 3.');
 end
 
-distToRover = transpose(distTo
-fig = plotspace(beacon, roverInitPosition);
+plotspace(beacon, roverInitPosition);
+distNoise = addnoise(distToRover);
 
-
-function figure = plotspace(beacon,roverInitPosition)
+function plotspace(beacon,roverInitPosition)
     scatter(beacon(:,1),beacon(:,2),'x','magenta');
     hold on
-    figure = scatter(roverInitPosition.x,roverInitPosition.y,...
+    scatter(roverInitPosition.x,roverInitPosition.y,...
           'diamond','black','filled');
     title('Initial Space')
     xlabel('X axis');
     ylabel('Y axis')
+    hold off
 end
 
+function noised = addnoise(distToRover)
+    noised = distToRover + 10 * max(space.x)/numel(space.x);
+end

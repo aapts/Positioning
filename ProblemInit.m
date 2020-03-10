@@ -29,17 +29,3 @@ elseif params.problemDim == 3
     end 
 else error('Error. Set the dimension of a problem at 2 or 3.');
 end
-
-plotspace(beacon, roverInitPosition);
-
-
-function plotspace(beacon,roverInitPosition)
-    scatter(beacon(:,1),beacon(:,2),'x','magenta');
-    hold on
-    scatter(roverInitPosition.x,roverInitPosition.y,...
-          'diamond','black','filled');
-    title('Initial Space')
-    xlabel('X axis');
-    ylabel('Y axis')
-    hold off
-end
