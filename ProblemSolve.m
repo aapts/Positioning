@@ -1,25 +1,32 @@
 clear 
 close all 
-
+% 
 ProblemInit;
-distNoise = addnoise(distToRover, space, 100);
-[rad, phi,chi] = numericEqns(params,beacon,distToRover);
+distNoise = addnoise(distToRover, 10);
+[eqns, phi,chi] = numericEqns(params,beacon,distNoise);
 
-plotSpace(beacon, rad, roverInitPosition,space);
+plotSpace(beacon, eqns, roverInitPosition,space);
 
-solut = cell(numel(rad));
-for i = 1:numel(rad)
-    for j = i+1:numel(rad)
-        solut{i,j} = solve([rad(i) rad(j)],[phi chi]);
-        solut{j,i} = solut{i,j};
-    end
-end
+solut = circleIntersect(eqns, phi, chi);
 
 function [rad,phi,chi] = numericEqns(params,beacon,distToRover)
     syms chi phi 
     for i = 1:params.anchorQuantity
         rad(i) = (beacon(i,1)-chi)^2 + (beacon(i,2)-phi)^2 == distToRover(i)^2;
     end
+end
+
+function pts = circleIntersect(eqns, phi,chi)
+pts = cell(numel(eqns));
+for i = 1:numel(eqns)
+    for j = i+1:numel(eqns)
+        pts{j,i} = solve([eqns(i) eqns(j)],[chi phi]);
+        pts{i,j}.phi = double(pts{j,i}.phi);
+        pts{i,j}.chi = double(pts{j,i}.chi);
+        pts{i,j}.sol1 = [pts{i,j}.chi(1) pts{i,j}.phi(1)];
+        pts{i,j}.sol2 = [pts{i,j}.chi(2) pts{i,j}.phi(2)];
+    end
+end
 end
 
 function plotSpace(beacons,circles,rover,space)
@@ -32,6 +39,7 @@ function plotSpace(beacons,circles,rover,space)
     ylabel('\phi')
     fimplicit(circles(:), [min(space.x) max(space.x)]);
     hold off
+    grid on
 end
 
 function err = calcError(roverInit, roverAcq)
@@ -39,7 +47,7 @@ function err = calcError(roverInit, roverAcq)
                [roverAcq.x;  roverAcq.y]);
 end
 
-function noised = addnoise(dist, space, fineness)
-    noised = dist + randn / fineness;
-    sigma = noised - dist
+function noised = addnoise(dist, fineness)
+    randoms = imag(ifft(randn(1,100500)));
+    noised = dist + randoms(randi(numel(randoms)))./fineness;
 end

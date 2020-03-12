@@ -1,11 +1,12 @@
-clear 
-close all 
-
+% clear 
+% close all 
+% 
 ProblemInit;
-distNoise = addnoise(distToRover, space, 100);
-[rad, phi,chi] = numericEqns(params,beacon,distToRover);
+distNoise = addnoise(distToRover, 10);
+[rad, phi,chi] = numericEqns(params,beacon,distNoise);
 
 plotSpace(beacon, rad, roverInitPosition,space);
+
 solut = cell(numel(rad));
 for i = 1:numel(rad)
     for j = i+1:numel(rad)
@@ -13,6 +14,7 @@ for i = 1:numel(rad)
         solut{j,i} = solut{i,j};
     end
 end
+clear i j space
 
 function [rad,phi,chi] = numericEqns(params,beacon,distToRover)
     syms chi phi 
@@ -20,6 +22,8 @@ function [rad,phi,chi] = numericEqns(params,beacon,distToRover)
         rad(i) = (beacon(i,1)-chi)^2 + (beacon(i,2)-phi)^2 == distToRover(i)^2;
     end
 end
+
+function solut = solutions(
 
 function plotSpace(beacons,circles,rover,space)
     scatter(beacons(:,1),beacons(:,2),'x','magenta');
@@ -38,6 +42,7 @@ function err = calcError(roverInit, roverAcq)
                [roverAcq.x;  roverAcq.y]);
 end
 
-function noised = addnoise(dist, space, fineness)
-    noised = dist+ 1 * max(space.x)/numel(space.x) + randn / fineness;
+function noised = addnoise(dist, fineness)
+    randoms = imag(ifft(randn(1,100500)));
+    noised = dist + randoms(randi(numel(randoms)))./fineness;
 end
