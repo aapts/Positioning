@@ -3,9 +3,9 @@
 % ProblemInit;
 % distNoise = addnoise(distToRover, space, 100);
 
-rad, phi,chi = numericEqns(params,beacon,distToRover);
+[rad, phi,chi] = numericEqns(params,beacon,distToRover);
 
-% plotSpace(beacon, rad, roverInitPosition,space);
+plotSpace(beacon, rad, roverInitPosition,space);
 solut = cell(numel(rad));
 for i = 1:numel(rad)
     for j = i+1:numel(rad)
@@ -14,7 +14,7 @@ for i = 1:numel(rad)
     end
 end
 
-function [rad,phi,chi = numericEqns(params,beacon,distToRover)
+function [rad] = numericEqns(params,beacon,distToRover)
     syms chi phi 
     for i = 1:params.anchorQuantity
         rad(i) = (beacon(i,1)-chi)^2 + (beacon(i,2)-phi)^2 == distToRover(i)^2;

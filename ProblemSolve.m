@@ -1,11 +1,11 @@
-% clear 
-% close all 
-% ProblemInit;
-% distNoise = addnoise(distToRover, space, 100);
+clear 
+close all 
+ProblemInit;
+distNoise = addnoise(distToRover, space, 100);
 
 [rad, phi,chi] = numericEqns(params,beacon,distToRover);
 
-% plotSpace(beacon, rad, roverInitPosition,space);
+plotSpace(beacon, rad, roverInitPosition,space);
 solut = cell(numel(rad));
 for i = 1:numel(rad)
     for j = i+1:numel(rad)
