@@ -42,10 +42,7 @@ trilat.y = mode(trilat.Points(2,:));
 err = calcError(roverInitPosition, trilat);
 finPlotSpace(beacon, 0, roverInitPosition, trilat, params);
 clear i j k l eex ey ez P1 P2 P3 U Vx Vy
-%% Method3: Perticle Filter with Robotic System Toolbox
-pf = stateEstimatorPF;
-pf.StateEstimationMethod = 'mean';
-pf.ResamplingMethod
+
 %% Method 2 Functions
 function buf = trilatResults(dist1, dist2, dist3, U, Vx, Vy, ex, ey, P1, params) 
 %https://en.wikipedia.org/wiki/True_range_multilateration
