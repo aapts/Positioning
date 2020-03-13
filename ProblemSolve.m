@@ -4,13 +4,10 @@ ProblemInit;
 %% Method 1: analytical intersections of circles
 distNoise = addnoise(distToRover, 10);
 [eqns,chi,phi] = analyticEqns(params,beacon,distNoise);
-
 % plotSpace(beacon, eqns, roverInitPosition,space);
 
 ptsIntersection = circleIntersections(eqns, chi, phi, space);
-
 roverCalcPosition = intersecionMean(ptsIntersection);
-
 err = calcError(roverInitPosition, roverCalcPosition);
 finPlotSpace(beacon, 0, roverInitPosition, roverCalcPosition,space);
 %% Method 2: 
@@ -95,17 +92,17 @@ end
     grid on
 end
 
-function noised = addnoise(dist, fineness)
-    randoms = imag(ifft(randn(1,100500)));
-    noised = dist + randoms(randi(numel(randoms)))./fineness;
-end
-
 function finPlotSpace(beacons,circles,roverInit,roverCalc,space)
     hold on
     plotSpace(beacons,circles,roverInit,space)
     scatter(roverCalc.x,roverCalc.y,...
         'diamond','green');
     hold off
+end
+
+function noised = addnoise(dist, fineness)
+    randoms = imag(ifft(randn(1,100500)));
+    noised = dist + randoms(randi(numel(randoms)))./fineness;
 end
 
 function err = calcError(roverInit, roverAcq)
