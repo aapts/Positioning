@@ -1,4 +1,4 @@
-params.anchorQuantity = 5;
+params.anchorQuantity = 10;
 params.problemDim = 2;
 params.spaceFineness = 1500;
 
