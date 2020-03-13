@@ -1,8 +1,8 @@
 clear 
 close all
 ProblemInit;
-%% Method 1: analytical intersections of circles
 distNoise = addnoise(distToRover, 10);
+%% Method 1: analytical intersections of circles
 [eqns,chi,phi] = analyticEqns(params,beacon,distNoise);
 % plotSpace(beacon, eqns, roverInitPosition,space);
 
@@ -17,55 +17,62 @@ trilat.x = 0;
 trilat.y = 0;
 trilat.z = 0;
 len = length(beacon);
-buf = zeros(3,sum(linspace(1,len-2,len-2).*linspace(len-2,1,len-2)));
+trilat.Points = zeros(3,sum(linspace(1,len-2,len-2).*linspace(len-2,1,len-2)));
 
 for i = 1:length(beacon)
     for j = i+1:length(beacon)
         for k = j+1:length(beacon)
             l = l + 1;
-            [P1, P2, P3] = trilatPoints(i,j,k,beacon);
+            [P1, P2, P3] = trilatInit(i,j,k,beacon);
             [U, Vx, Vy, ex, ey, ez] = lineMap(P1, P2, P3);
-
-            %https://en.wikipedia.org/wiki/True_range_multilateration
-            trilat.x = ((distToRover(i)^2) - (distToRover(j)^2) + (U^2))...
-                       /...
-                       (2*U);
-            trilat.y = (((distToRover(i)^2) - (distToRover(k)^2) + (Vx^2)...
-                       +...
-                       (Vy^2) - 2*Vx)/(2*Vy))...
-                       - ...
-                       ((Vx/Vy)*trilat.x);                   
-            buf(:,l) = P1 + trilat.x * ex + trilat.y * ey;
-            if      or((buf(1,l)>max(params.space.x)),...
-                       (buf(1,l)<min(params.space.x))) 
-                buf(1,l)=NaN;
-                buf(2,l)=NaN;
-                buf(3,l)=NaN;
-            elseif  or((buf(2,l)>max(params.space.x)),...
-                       (buf(2,l)<min(params.space.x))) 
-                buf(1,l)=NaN;
-                buf(2,l)=NaN;
-                buf(3,l)=NaN;          
-            end
+            trilat.Points(:,l) = trilatResults(distNoise(i),...
+                                               distNoise(j),...
+                                               distNoise(k),...
+                                               U, Vx, Vy, ex, ey, P1, params); 
 %             tmp.x = buf(1,l); tmp.y = buf(2,l);
 %             finPlotSpace(beacon, 0, roverInitPosition, tmp, params);
-            hold on
-
+%             hold on
         end
     end
 end
-buf = rmmissing(buf,2);
-trilat.x = mode(buf(1,:));
-trilat.y = mode(buf(2,:));
+trilat.Points = rmmissing(trilat.Points,2);
+trilat.x = mode(trilat.Points(1,:));
+trilat.y = mode(trilat.Points(2,:));
 
 err = calcError(roverInitPosition, trilat);
 finPlotSpace(beacon, 0, roverInitPosition, trilat, params);
+clear i j k l eex ey ez P1 P2 P3 U Vx Vy
 %% Method3: Perticle Filter with Robotic System Toolbox
 pf = stateEstimatorPF;
 pf.StateEstimationMethod = 'mean';
 pf.ResamplingMethod
 %% Method 2 Functions
-function [P1, P2, P3] = trilatPoints(i,j,k, beacon)
+function buf = trilatResults(dist1, dist2, dist3, U, Vx, Vy, ex, ey, P1, params) 
+%https://en.wikipedia.org/wiki/True_range_multilateration
+
+    x = ((dist1^2) - (dist2^2) + (U^2))...
+               /...
+               (2*U);
+    y = (((dist1^2) - (dist3^2) + (Vx^2)...
+               +...
+               (Vy^2) - 2*Vx)/(2*Vy))...
+               - ...
+               ((Vx/Vy)*x);                   
+    buf = P1 + x * ex + y * ey;
+    if      or((buf>max(params.space.x)),...
+               (buf<min(params.space.x))) 
+        buf(1)=NaN;
+        buf(2)=NaN;
+        buf(3)=NaN;
+    elseif  or((buf(2)>max(params.space.x)),...
+               (buf(2)<min(params.space.x))) 
+        buf(1)=NaN;
+        buf(2)=NaN;
+        buf(3)=NaN;          
+    end
+end
+
+function [P1, P2, P3] = trilatInit(i,j,k, beacon)
         xI = beacon(i,1);
         yI = beacon(i,2);
         zI = beacon(i,3);
