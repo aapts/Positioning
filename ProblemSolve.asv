@@ -1,28 +1,106 @@
 clear 
-close all 
+close all
 ProblemInit;
-
+%% Method 1: analytical intersections of circles
 distNoise = addnoise(distToRover, 10);
 [eqns,chi,phi] = analyticEqns(params,beacon,distNoise);
-
 % plotSpace(beacon, eqns, roverInitPosition,space);
 
-ptsIntersection = circleIntersections(eqns, chi, phi, space);
-
+ptsIntersection = circleIntersections(eqns, chi, phi, params);
 roverCalcPosition = intersecionMean(ptsIntersection);
-
 err = calcError(roverInitPosition, roverCalcPosition);
-finPlotSpace(beacon, 0, roverInitPosition, roverCalcPosition,space);
+finPlotSpace(beacon, 0, roverInitPosition, roverCalcPosition, params);
+clear chi phi eqns ptsIntersection 
+%% Method 2: More fine trilateration
+l = 0;
+trilat.x = 0;
+trilat.y = 0;
+trilat.z = 0;
+len = length(beacon);
+buf = zeros(3,sum(linspace(1,len-2,len-2).*linspace(len-2,1,len-2)));
 
+for i = 1:length(beacon)
+    for j = i+1:length(beacon)
+        for k = j+1:length(beacon)
+            l = l + 1;
+            [P1, P2, P3] = trilatPoints(i,j,k,beacon);
+            [U, Vx, Vy, ex, ey, ez] = lineMap(P1, P2, P3);
+
+            %https://en.wikipedia.org/wiki/True_range_multilateration
+            trilat.x = ((distToRover(i)^2) - (distToRover(j)^2) + (U^2))...
+                       /...
+                       (2*U);
+            trilat.y = (((distToRover(i)^2) - (distToRover(k)^2) + (Vx^2)...
+                       +...
+                       (Vy^2) - 2*Vx)/(2*Vy))...
+                       - ...
+                       ((Vx/Vy)*trilat.x);                   
+            buf(:,l) = P1 + trilat.x * ex + trilat.y * ey;
+            if      or((buf(1,l)>max(params.space.x)),...
+                       (buf(1,l)<min(params.space.x))) 
+                buf(1,l)=NaN;
+                buf(2,l)=NaN;
+                buf(3,l)=NaN;
+            elseif  or((buf(2,l)>max(params.space.x)),...
+                       (buf(2,l)<min(params.space.x))) 
+                buf(1,l)=NaN;
+                buf(2,l)=NaN;
+                buf(3,l)=NaN;          
+            end
+%             tmp.x = buf(1,l); tmp.y = buf(2,l);
+%             finPlotSpace(beacon, 0, roverInitPosition, tmp, params);
+            hold on
+
+        end
+    end
+end
+buf = rmmissing(buf,2);
+trilat.x = mean(buf(1,:));
+trilat.y = mean(buf(2,:));
+
+err = calcError(roverInitPosition, trilat);
+finPlotSpace(beacon, 0, roverInitPosition, trilat, params);
+%% Method3: Perticle Filter with Robotic System Toolbox
+pf = stateEstimatorPF;
+pf.StateEstimationMethod = 'mean';
+pf.ResamplingMethod
+%% Method 2 Functions
+function [P1, P2, P3] = trilatPoints(i,j,k, beacon)
+        xI = beacon(i,1);
+        yI = beacon(i,2);
+        zI = beacon(i,3);
+
+        xJ = beacon(j,1);
+        yJ = beacon(j,2);
+        zJ = beacon(j,3);
+        
+        xK = beacon(k,1);
+        yK = beacon(k,2);
+        zK = beacon(k,3);
+        
+        P1 = [xI; yI; zI];
+        P2 = [xJ; yJ; zJ];
+        P3 = [xK; yK; zK];
+end
+
+function [U, Vx, Vy, ex, ey, ez] = lineMap(P1,P2,P3)
+        U  = norm(P2 - P1);        
+        ex = (P2 - P1) / (norm(P2 - P1));
+        Vx  = dot(ex, (P3 - P1));
+        ey = (P3 - P1 - Vx*ex) / (norm(P3 - P1 - Vx*ex));
+        ez = cross(ex, ey);        
+        Vy  = dot(ey, (P3 - P1));
+end
+%% Method 1 Functions
 function [rad,chi,phi] = analyticEqns(params,beacon,distToRover)
-    syms chi phi 
+    syms  chi phi  
     rad = sym(zeros(1,params.anchorQuantity));
     for i = 1:params.anchorQuantity
-        rad(i) = (beacon(i,1)-chi)^2 + (beacon(i,2)-phi)^2 == distToRover(i)^2;
+        rad(i) = (beacon(i,1)- chi)^2 + (beacon(i,2)-phi)^2 == distToRover(i)^2;
     end
 end
 
-function pts = circleIntersections(eqns, chi,phi, space)
+function pts = circleIntersections(eqns, chi,phi, params)
     pts = cell(numel(eqns));
     for i = 1:numel(eqns)
         for j = i+1:numel(eqns)
@@ -32,29 +110,29 @@ function pts = circleIntersections(eqns, chi,phi, space)
             pts{j,i}.sol1 = [pts{j,i}.chi(1) pts{j,i}.phi(1)];
             pts{j,i}.sol2 = [pts{j,i}.chi(2) pts{j,i}.phi(2)];
             
-            if      pts{2,1}.sol1(1) < max(space.x) &&...
-                    pts{2,1}.sol1(1) > min(space.x) &&...
-                    pts{2,1}.sol1(2) < max(space.y) &&...
-                    pts{2,1}.sol1(2) > min(space.y) &&...
-                    norm(pts{2,1}.sol1 - pts{j,i}.sol1) < 2*mean(diff(space.x))
+            if      pts{2,1}.sol1(1) < max(params.space.x) &&...
+                    pts{2,1}.sol1(1) > min(params.space.x) &&...
+                    pts{2,1}.sol1(2) < max(params.space.y) &&...
+                    pts{2,1}.sol1(2) > min(params.space.y) &&...
+                    norm(pts{2,1}.sol1 - pts{j,i}.sol1) < 2*mean(diff(params.space.x))
                         pts{i,j} = pts{j,i}.sol1;
-            elseif  pts{2,1}.sol2(1) < max(space.x) &&...
-                    pts{2,1}.sol2(1) > min(space.x) &&...
-                    pts{2,1}.sol2(2) < max(space.y) &&...
-                    pts{2,1}.sol2(2) > min(space.y) &&...
-                    norm(pts{2,1}.sol2 - pts{j,i}.sol2) < 2*mean(diff(space.x))
+            elseif  pts{2,1}.sol2(1) < max(params.space.x) &&...
+                    pts{2,1}.sol2(1) > min(params.space.x) &&...
+                    pts{2,1}.sol2(2) < max(params.space.y) &&...
+                    pts{2,1}.sol2(2) > min(params.space.y) &&...
+                    norm(pts{2,1}.sol2 - pts{j,i}.sol2) < 2*mean(diff(params.space.x))
                         pts{i,j} = pts{j,i}.sol2;
-            elseif  pts{2,1}.sol1(1) < max(space.x) &&...
-                    pts{2,1}.sol1(1) > min(space.x) &&...
-                    pts{2,1}.sol1(2) < max(space.y) &&...
-                    pts{2,1}.sol1(2) > min(space.y) &&...
-                    norm(pts{2,1}.sol1 - pts{j,i}.sol2) < 2*mean(diff(space.x))
+            elseif  pts{2,1}.sol1(1) < max(params.space.x) &&...
+                    pts{2,1}.sol1(1) > min(params.space.x) &&...
+                    pts{2,1}.sol1(2) < max(params.space.y) &&...
+                    pts{2,1}.sol1(2) > min(params.space.y) &&...
+                    norm(pts{2,1}.sol1 - pts{j,i}.sol2) < 2*mean(diff(params.space.x))
                         pts{i,j} = pts{j,i}.sol2;
-            elseif  pts{2,1}.sol2(1) < max(space.x) &&...
-                    pts{2,1}.sol2(1) > min(space.x) &&...
-                    pts{2,1}.sol2(2) < max(space.y) &&...
-                    pts{2,1}.sol2(2) > min(space.y) &&...
-                    norm(pts{2,1}.sol2 - pts{j,i}.sol1) < 2*mean(diff(space.x))
+            elseif  pts{2,1}.sol2(1) < max(params.space.x) &&...
+                    pts{2,1}.sol2(1) > min(params.space.x) &&...
+                    pts{2,1}.sol2(2) < max(params.space.y) &&...
+                    pts{2,1}.sol2(2) > min(params.space.y) &&...
+                    norm(pts{2,1}.sol2 - pts{j,i}.sol1) < 2*mean(diff(params.space.x))
                         pts{i,j} = pts{j,i}.sol1;
             end
         end
@@ -75,8 +153,8 @@ function acquiredIntersecrionPoint = intersecionMean(pts)
     acquiredIntersecrionPoint.x = acquiredIntersecrionPoint.x / k;
     acquiredIntersecrionPoint.y = acquiredIntersecrionPoint.y / k;
 end
-
-function plotSpace(beacons,circles,roverInit,space)
+%% GP Functions
+function plotSpace(beacons,circles,roverInit,params)
     scatter(beacons(:,1),beacons(:,2),'x','magenta');
     hold on
     scatter(roverInit.x,roverInit.y,...
@@ -87,7 +165,7 @@ function plotSpace(beacons,circles,roverInit,space)
 if circles == 0
     return
 else
-    fimplicit(circles(:), [min(space.x) max(space.x)]);
+    fimplicit(circles(:), [min(params.space.x) max(params.space.x)]);
 end
     hold off
     grid on
@@ -101,12 +179,12 @@ function finPlotSpace(beacons,circles,roverInit,roverCalc,space)
     hold off
 end
 
-function err = calcError(roverInit, roverAcq)
-    err = norm([roverInit.x; roverInit.y] - ...
-               [roverAcq.x;  roverAcq.y]);
-end
-
 function noised = addnoise(dist, fineness)
     randoms = imag(ifft(randn(1,100500)));
     noised = dist + randoms(randi(numel(randoms)))./fineness;
+end
+
+function err = calcError(roverInit, roverAcq)
+    err = norm([roverInit.x; roverInit.y] - ...
+               [roverAcq.x;  roverAcq.y]);
 end

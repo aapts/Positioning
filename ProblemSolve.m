@@ -1,5 +1,5 @@
 clear 
-close all 
+close all
 ProblemInit;
 %% Method 1: analytical intersections of circles
 distNoise = addnoise(distToRover, 10);
@@ -11,9 +11,87 @@ roverCalcPosition = intersecionMean(ptsIntersection);
 err = calcError(roverInitPosition, roverCalcPosition);
 finPlotSpace(beacon, 0, roverInitPosition, roverCalcPosition, params);
 clear chi phi eqns ptsIntersection 
-%% Method 2: 
+%% Method 2: More fine trilateration
+l = 0;
+trilat.x = 0;
+trilat.y = 0;
+trilat.z = 0;
+len = length(beacon);
+buf = zeros(3,sum(linspace(1,len-2,len-2).*linspace(len-2,1,len-2)));
 
-%% Functions
+for i = 1:length(beacon)
+    for j = i+1:length(beacon)
+        for k = j+1:length(beacon)
+            l = l + 1;
+            [P1, P2, P3] = trilatPoints(i,j,k,beacon);
+            [U, Vx, Vy, ex, ey, ez] = lineMap(P1, P2, P3);
+
+            %https://en.wikipedia.org/wiki/True_range_multilateration
+            trilat.x = ((distToRover(i)^2) - (distToRover(j)^2) + (U^2))...
+                       /...
+                       (2*U);
+            trilat.y = (((distToRover(i)^2) - (distToRover(k)^2) + (Vx^2)...
+                       +...
+                       (Vy^2) - 2*Vx)/(2*Vy))...
+                       - ...
+                       ((Vx/Vy)*trilat.x);                   
+            buf(:,l) = P1 + trilat.x * ex + trilat.y * ey;
+            if      or((buf(1,l)>max(params.space.x)),...
+                       (buf(1,l)<min(params.space.x))) 
+                buf(1,l)=NaN;
+                buf(2,l)=NaN;
+                buf(3,l)=NaN;
+            elseif  or((buf(2,l)>max(params.space.x)),...
+                       (buf(2,l)<min(params.space.x))) 
+                buf(1,l)=NaN;
+                buf(2,l)=NaN;
+                buf(3,l)=NaN;          
+            end
+%             tmp.x = buf(1,l); tmp.y = buf(2,l);
+%             finPlotSpace(beacon, 0, roverInitPosition, tmp, params);
+            hold on
+
+        end
+    end
+end
+buf = rmmissing(buf,2);
+trilat.x = mode(buf(1,:));
+trilat.y = mode(buf(2,:));
+
+err = calcError(roverInitPosition, trilat);
+finPlotSpace(beacon, 0, roverInitPosition, trilat, params);
+%% Method3: Perticle Filter with Robotic System Toolbox
+pf = stateEstimatorPF;
+pf.StateEstimationMethod = 'mean';
+pf.ResamplingMethod
+%% Method 2 Functions
+function [P1, P2, P3] = trilatPoints(i,j,k, beacon)
+        xI = beacon(i,1);
+        yI = beacon(i,2);
+        zI = beacon(i,3);
+
+        xJ = beacon(j,1);
+        yJ = beacon(j,2);
+        zJ = beacon(j,3);
+        
+        xK = beacon(k,1);
+        yK = beacon(k,2);
+        zK = beacon(k,3);
+        
+        P1 = [xI; yI; zI];
+        P2 = [xJ; yJ; zJ];
+        P3 = [xK; yK; zK];
+end
+
+function [U, Vx, Vy, ex, ey, ez] = lineMap(P1,P2,P3)
+        U  = norm(P2 - P1);        
+        ex = (P2 - P1) / (norm(P2 - P1));
+        Vx  = dot(ex, (P3 - P1));
+        ey = (P3 - P1 - Vx*ex) / (norm(P3 - P1 - Vx*ex));
+        ez = cross(ex, ey);        
+        Vy  = dot(ey, (P3 - P1));
+end
+%% Method 1 Functions
 function [rad,chi,phi] = analyticEqns(params,beacon,distToRover)
     syms  chi phi  
     rad = sym(zeros(1,params.anchorQuantity));
@@ -75,7 +153,7 @@ function acquiredIntersecrionPoint = intersecionMean(pts)
     acquiredIntersecrionPoint.x = acquiredIntersecrionPoint.x / k;
     acquiredIntersecrionPoint.y = acquiredIntersecrionPoint.y / k;
 end
-
+%% GP Functions
 function plotSpace(beacons,circles,roverInit,params)
     scatter(beacons(:,1),beacons(:,2),'x','magenta');
     hold on

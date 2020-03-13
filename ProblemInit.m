@@ -1,5 +1,5 @@
 params.anchorQuantity = 10;
-params.problemDim = 2;
+params.problemDim = 3;
 params.spaceFineness = 1500;
 
 params.space.x = linspace(-10, 10, params.spaceFineness);
@@ -8,7 +8,7 @@ params.space.z = linspace(-10, 10, params.spaceFineness);
 
 roverInitPosition.x = params.space.x(randi(size(params.space.x)));
 roverInitPosition.y = params.space.y(randi(size(params.space.y)));
-roverInitPosition.z = params.space.z(randi(size(params.space.z)));
+roverInitPosition.z = 0;
 distToRover = zeros(1,params.anchorQuantity);
 beacon = zeros(params.anchorQuantity,params.problemDim);
 
@@ -36,23 +36,20 @@ elseif params.problemDim == 3
     for i = 1:params.anchorQuantity
         beacon(i,1) = params.space.x(randi(size(params.space.x)));
         beacon(i,2) = params.space.y(randi(size(params.space.y)));
-        beacon(i,3) = params.space.z(randi(size(params.space.z)));
+        beacon(i,3) = 0;
     end
     beacon(1,1) = min(params.space.x);
     beacon(1,2) = min(params.space.y);
-    beacon(1,3) = min(params.space.z);
     
     beacon(2,1) = min(params.space.x);
     beacon(2,2) = max(params.space.y);
-    beacon(2,3) = min(params.space.z);
     
     beacon(3,1) = max(params.space.x);
     beacon(3,2) = max(params.space.y);
-    beacon(3,3) = min(params.space.z);
     
     beacon(4,1) = max(params.space.x);
     beacon(4,2) = min(params.space.y);
-    beacon(4,3) = min(params.space.z);
+
     for i = 1:params.anchorQuantity
         distToRover(i) = norm ([roverInitPosition.x;roverInitPosition.y;roverInitPosition.z] - ...
                                [beacon(i,1);beacon(i,2);beacon(i,3)]);
