@@ -22,8 +22,7 @@ function [params, beacon, distToRover, noisedDistToRover, roverInitPosition] = .
 %   
 %   roverInitPosition - an original position of a point of interest.
 
-
-%%   setting up the space, the initial point position  
+%%   setting up the space and the initial POI position  
 params.anchorQuantity = anchQty;
 params.problemDim = probDim;
 params.spaceFineness = gridDensity; %a density of the grid we place anchors and the POI on
@@ -41,7 +40,6 @@ elseif params.problemDim == 3
 else
     error('Error. Set the dimension of a problem at 2 or 3.');
 end
-
 %% initializing the vital variables
 distToRover = zeros(1,params.anchorQuantity);
 noisedDistToRover = distToRover;
@@ -81,16 +79,18 @@ elseif params.problemDim == 3
     beacon(1,1) = min(params.space.x);
     beacon(1,2) = min(params.space.y);
     beacon(1,3) = min(params.space.z);
+    
     beacon(2,1) = min(params.space.x);
     beacon(2,2) = max(params.space.y);
     beacon(2,3) = min(params.space.z);
+    
     beacon(3,1) = max(params.space.x);
     beacon(3,2) = max(params.space.y);
-    beacon(3,3) = min(params.space.z);    
+    beacon(3,3) = min(params.space.z); 
+    
     beacon(4,1) = max(params.space.x);
     beacon(4,2) = min(params.space.y);
     beacon(4,3) = min(params.space.z);
-
     for i = 1:params.anchorQuantity
         distToRover(i) = norm ([roverInitPosition.x;roverInitPosition.y;roverInitPosition.z] - ...
                                [beacon(i,1);beacon(i,2);beacon(i,3)]);
@@ -99,8 +99,6 @@ elseif params.problemDim == 3
 else
     error('Error. Set the dimension of a problem at 2 or 3.');
 end
-
-
 end
 
 function noised = AddNoise(dist, randomSet, fineness)
