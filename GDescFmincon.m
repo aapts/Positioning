@@ -8,7 +8,7 @@ for i = 1:params.anchorQuantity
     eval(['f', num2str(i), '(x,y) = (bx - x)^2 + (by - y)^2 - dst^2']);
 end
 f = subs(f);
-fun = @(x) norm(double(f(x(1),x(2))))
+fun = @(x) norm(double(f(x(1),x(2))));
 fmincon(fun,[0,0], [],[])
 
 % end
