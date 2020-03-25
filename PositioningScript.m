@@ -1,16 +1,16 @@
-[params, beacons, distToRover, noisedDistToRover, roverInitPosition] = ...
+[params, beacons, dTR, dTRnoised, roverInitPosition] = ...
           ProblemInit(15, 2, 1500, 10);
 PlotSpace(beacons,0,roverInitPosition,params)
 %% Method 1: an analytical solution, mean of coordinates of intersections of pairs of circles      
-roverAnalytAcq  = AnalyticalMetod(params,beacons,distToRover);
+roverAnalyAcq  = AnalyticalMetod(params,beacons,dTR);
 
 figure
-FinPlotSpace(beacons, 0, roverInitPosition, roverAnalytAcq, params)
+FinPlotSpace(beacons, 0, roverInitPosition, roverAnalyAcq, params)
 title('Method of Analytical Intersections')
 
-errAnalyt = CalcError(roverInitPosition, roverAnalytAcq);
+errAnaly = CalcError(roverInitPosition, roverAnalyAcq);
 %% Method 2: Trilaterating the position of the POI
-roverTrilatAcq  = TrilaterationMethod(params,beacons,distToRover);
+roverTrilatAcq  = TrilaterationMethod(params,beacons,dTR);
 
 figure
 FinPlotSpace(beacons, 0, roverInitPosition, roverTrilatAcq, params)
