@@ -1,15 +1,11 @@
-clear 
-close all
-ProblemInit;
-distNoise = addnoise(distToRover, 10);
 %% Method 1: analytical intersections of circles
-[eqns,chi,phi] = analyticEqns(params,beacon,distNoise);
+[eqns,chi,phi] = AnalyticEqns(params,beacon,distNoise);
 % plotSpace(beacon, eqns, roverInitPosition,space);
 
-ptsIntersection = circleIntersections(eqns, chi, phi, params);
+ptsIntersection = CircleIntersections(eqns, chi, phi, params);
 roverCalcPosition = intersecionMean(ptsIntersection);
-err = calcError(roverInitPosition, roverCalcPosition);
-finPlotSpace(beacon, 0, roverInitPosition, roverCalcPosition, params);
+err = CalcError(roverInitPosition, roverCalcPosition);
+FinPlotSpace(beacon, 0, roverInitPosition, roverCalcPosition, params);
 clear chi phi eqns ptsIntersection 
 %% Method 2: More fine trilateration
 l = 0;
@@ -23,9 +19,9 @@ for i = 1:length(beacon)
     for j = i+1:length(beacon)
         for k = j+1:length(beacon)
             l = l + 1;
-            [P1, P2, P3] = trilatInit(i,j,k,beacon);
-            [U, Vx, Vy, ex, ey, ez] = lineMap(P1, P2, P3);
-            trilat.Points(:,l) = trilatResults(distNoise(i),...
+            [P1, P2, P3] = TrilatInit(i,j,k,beacon);
+            [U, Vx, Vy, ex, ey, ez] = LineMap(P1, P2, P3);
+            trilat.Points(:,l) = TrilatResults(distNoise(i),...
                                                distNoise(j),...
                                                distNoise(k),...
                                                U, Vx, Vy, ex, ey, P1, params); 
@@ -39,12 +35,12 @@ trilat.Points = rmmissing(trilat.Points,2);
 trilat.x = mode(trilat.Points(1,:));
 trilat.y = mode(trilat.Points(2,:));
 figure
-err = calcError(roverInitPosition, trilat);
-finPlotSpace(beacon, 0, roverInitPosition, trilat, params);
+err = CalcError(roverInitPosition, trilat);
+FinPlotSpace(beacon, 0, roverInitPosition, trilat, params);
 clear i j k l eex ey ez P1 P2 P3 U Vx Vy
 
 %% Method 2 Functions
-function buf = trilatResults(dist1, dist2, dist3, U, Vx, Vy, ex, ey, P1, params) 
+function buf = TrilatResults(dist1, dist2, dist3, U, Vx, Vy, ex, ey, P1, params) 
 %https://en.wikipedia.org/wiki/True_range_multilateration
 
     x = ((dist1^2) - (dist2^2) + (U^2))...
@@ -69,7 +65,7 @@ function buf = trilatResults(dist1, dist2, dist3, U, Vx, Vy, ex, ey, P1, params)
     end
 end
 
-function [P1, P2, P3] = trilatInit(i,j,k, beacon)
+function [P1, P2, P3] = TrilatInit(i,j,k, beacon)
         xI = beacon(i,1);
         yI = beacon(i,2);
         zI = beacon(i,3);
@@ -87,7 +83,7 @@ function [P1, P2, P3] = trilatInit(i,j,k, beacon)
         P3 = [xK; yK; zK];
 end
 
-function [U, Vx, Vy, ex, ey, ez] = lineMap(P1,P2,P3)
+function [U, Vx, Vy, ex, ey, ez] = LineMap(P1,P2,P3)
         U  = norm(P2 - P1);        
         ex = (P2 - P1) / (norm(P2 - P1));
         Vx  = dot(ex, (P3 - P1));
@@ -96,7 +92,7 @@ function [U, Vx, Vy, ex, ey, ez] = lineMap(P1,P2,P3)
         Vy  = dot(ey, (P3 - P1));
 end
 %% Method 1 Functions
-function [rad,chi,phi] = analyticEqns(params,beacon,distToRover)
+function [rad,chi,phi] = AnalyticEqns(params,beacon,distToRover)
     syms  chi phi  
     rad = sym(zeros(1,params.anchorQuantity));
     for i = 1:params.anchorQuantity
@@ -104,7 +100,7 @@ function [rad,chi,phi] = analyticEqns(params,beacon,distToRover)
     end
 end
 
-function pts = circleIntersections(eqns, chi,phi, params)
+function pts = CircleIntersections(eqns, chi,phi, params)
     pts = cell(numel(eqns));
     for i = 1:numel(eqns)
         for j = i+1:numel(eqns)
@@ -143,22 +139,22 @@ function pts = circleIntersections(eqns, chi,phi, params)
     end
 end
 
-function acquiredIntersecrionPoint = intersecionMean(pts)
-    acquiredIntersecrionPoint.x = 0;
-    acquiredIntersecrionPoint.y = 0;
+function AcquiredIntersecrionPoint = intersecionMean(pts)
+    AcquiredIntersecrionPoint.x = 0;
+    AcquiredIntersecrionPoint.y = 0;
     k = 0;
     for i = 1:size(pts)
         for j = i+1:size(pts)
-            acquiredIntersecrionPoint.x = pts{i,j}(1) + acquiredIntersecrionPoint.x;
-            acquiredIntersecrionPoint.y = pts{i,j}(2) + acquiredIntersecrionPoint.y;
+            AcquiredIntersecrionPoint.x = pts{i,j}(1) + AcquiredIntersecrionPoint.x;
+            AcquiredIntersecrionPoint.y = pts{i,j}(2) + AcquiredIntersecrionPoint.y;
             k = k + 1;
         end
     end
-    acquiredIntersecrionPoint.x = acquiredIntersecrionPoint.x / k;
-    acquiredIntersecrionPoint.y = acquiredIntersecrionPoint.y / k;
+    AcquiredIntersecrionPoint.x = AcquiredIntersecrionPoint.x / k;
+    AcquiredIntersecrionPoint.y = AcquiredIntersecrionPoint.y / k;
 end
 %% GP Functions
-function plotSpace(beacons,circles,roverInit,params)
+function PlotSpace(beacons,circles,roverInit,params)
     scatter(beacons(:,1),beacons(:,2),'x','magenta');
     hold on
     scatter(roverInit.x,roverInit.y,...
@@ -175,20 +171,15 @@ end
     grid on
 end
 
-function finPlotSpace(beacons,circles,roverInit,roverCalc,space)
+function FinPlotSpace(beacons,circles,roverInit,roverCalc,space)
     hold on
-    plotSpace(beacons,circles,roverInit,space)
+    PlotSpace(beacons,circles,roverInit,space)
     scatter(roverCalc.x,roverCalc.y,...
         'diamond','green');
     hold off
 end
 
-function noised = addnoise(dist, fineness)
-    randoms = imag(ifft(randn(1,100500)));
-    noised = dist + randoms(randi(numel(randoms)))./fineness;
-end
-
-function err = calcError(roverInit, roverAcq)
+function err = CalcError(roverInit, roverAcq)
     err = norm([roverInit.x; roverInit.y] - ...
                [roverAcq.x;  roverAcq.y]);
 end
