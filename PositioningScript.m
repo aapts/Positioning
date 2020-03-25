@@ -18,6 +18,7 @@ title('Trilateration Method')
 
 errTrilat = CalcError(roverInitPosition, roverTrilatAcq);
 %% Method 3: fmincon. Approaching the solution with the gradient descent
+
 %% GP Functions
 function FinPlotSpace(beacons,circles,roverInit,roverCalc,params)
 %plots the original POI and calculated one.
