@@ -1,0 +1,32 @@
+
+
+[params, beacons, distToRover, noisedDistToRover, roverInitPosition] = ...
+          ProblemInit(5, 2, 1500, 10);
+      
+PlotSpace(beacons,eqns,roverInitPosition,params)
+
+%% GP Functions
+function FinPlotSpace(beacons,circles,roverInit,roverCalc,space)
+    hold on
+    PlotSpace(beacons,circles,roverInit,space)
+    scatter(roverCalc.x,roverCalc.y,...
+        'diamond','green');
+    hold off
+end
+function PlotSpace(beacons,circles,roverInit,params)
+    figure
+    scatter(beacons(:,1),beacons(:,2),'x','magenta');
+    hold on
+    scatter(roverInit.x,roverInit.y,...
+          'diamond','black','filled');
+    title('Initial Space')
+    xlabel('\chi');
+    ylabel('\phi')
+if circles == 0
+    return
+else
+    fimplicit(circles(:), [min(params.space.x) max(params.space.x)]);
+end
+    hold off
+    grid on
+end

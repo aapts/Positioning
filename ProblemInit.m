@@ -34,7 +34,14 @@ params.space.z = linspace(-10, 10, params.spaceFineness);
 
 roverInitPosition.x = params.space.x(randi(size(params.space.x)));
 roverInitPosition.y = params.space.y(randi(size(params.space.y)));
-roverInitPosition.z = 0;
+if params.problemDim == 2
+    roverInitPosition.z = 0;
+elseif params.problemDim == 3
+    roverInitPosition.z = params.space.z(randi(size(params.space.y)));
+else
+    error('Error. Set the dimension of a problem at 2 or 3.');
+end
+
 %% initializing the vital variables
 distToRover = zeros(1,params.anchorQuantity);
 noisedDistToRover = distToRover;
@@ -47,6 +54,7 @@ if params.problemDim == 2
     for i = 1:params.anchorQuantity
         beacon(i,1) = params.space.x(randi(size(params.space.x)));
         beacon(i,2) = params.space.y(randi(size(params.space.y)));
+        beacon(i,3) = 0;
     end
     beacon(1,1) = min(params.space.x);
     beacon(1,2) = min(params.space.y);
@@ -105,3 +113,4 @@ function rndSet = RandomSet(seed)
     rng(seed);
     rndSet = imag(ifft(randn(1,3000)));
 end
+
