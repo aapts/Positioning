@@ -11,8 +11,5 @@ f = subs(f);
 fun = @(x) norm(double(f(x(1),x(2))))
 fmincon(fun,[0,0], [],[])
 
-function f = eqns(fun,x,y)
-    f = double(fun(x,y));
-end
 % end
 
