@@ -8,15 +8,9 @@ function [beacon, distToRover, params, roverInitPosition] = ...
 %   the grid
 %       [1, 1] [1, 2] [1, 3] - set of coordinates of the 1st anchor
 %       the first 4 beacons are placed in corners of the grid
+%   distToRover - an original position of a point of interest.
 %   
-%   distToRover - an array of distances between every anchor and the point of
-%   interest
-%   
-%   params - struct with parameters of the problem. Contains the dimension, 
-%   the grid density, the quantity of anchors and the grid,  where all the
-%   anchors and the point are positioned. 
-%   
-%   roverInitPosition - an original position of a point of interest.
+
 
 
 %%     
@@ -58,20 +52,19 @@ elseif params.problemDim == 3
     for i = 1:params.anchorQuantity
         beacon(i,1) = params.space.x(randi(size(params.space.x)));
         beacon(i,2) = params.space.y(randi(size(params.space.y)));
-        beacon(i,3) = params.space.z(randi(size(params.space.y)));
+        beacon(i,3) = 0;
     end
     beacon(1,1) = min(params.space.x);
     beacon(1,2) = min(params.space.y);
-    beacon(1,3) = min(params.space.z);
+    
     beacon(2,1) = min(params.space.x);
     beacon(2,2) = max(params.space.y);
-    beacon(2,3) = min(params.space.z);
+    
     beacon(3,1) = max(params.space.x);
     beacon(3,2) = max(params.space.y);
-    beacon(3,3) = min(params.space.z);    
+    
     beacon(4,1) = max(params.space.x);
     beacon(4,2) = min(params.space.y);
-    beacon(4,3) = min(params.space.z);
 
     for i = 1:params.anchorQuantity
         distToRover(i) = norm ([roverInitPosition.x;roverInitPosition.y;roverInitPosition.z] - ...

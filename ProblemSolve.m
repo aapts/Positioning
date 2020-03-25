@@ -38,7 +38,7 @@ end
 trilat.Points = rmmissing(trilat.Points,2);
 trilat.x = mode(trilat.Points(1,:));
 trilat.y = mode(trilat.Points(2,:));
-
+figure
 err = calcError(roverInitPosition, trilat);
 finPlotSpace(beacon, 0, roverInitPosition, trilat, params);
 clear i j k l eex ey ez P1 P2 P3 U Vx Vy
