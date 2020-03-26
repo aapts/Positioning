@@ -1,6 +1,3 @@
-<<<<<<< Updated upstream
-d
-=======
 [params, beacons, dTR, dTRnoised, roverInitPosition, sd] = ...
           ProblemInit(5, 2, 1500, 0); 
       
