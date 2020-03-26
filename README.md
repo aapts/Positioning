@@ -62,7 +62,8 @@ and the real POI.
           %distances. To evaluate such a point, we create a functional vector with 
           %differences of distances between points and anchors. 
           %
-          %functin accepts the struct of problem aprameters, an array of beacons and the
-          %array of original known distances. optional: define the start point of the
-          %minimizer wsearch
+          %functin accepts the struct of problem aprameters, 
+          %an array of beacons and the array of 
+          %original known distances. optional: 
+          %define the start point of the minimizer search
  
