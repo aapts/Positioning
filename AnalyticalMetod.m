@@ -10,6 +10,7 @@ function roverCalcPosition = AnalyticalMetod(params,beacons,distances)
 %bound area)
 %
 %method works only if the dimension of a problem is == 2
+
 if params.problemDim == 2
     [eqns,chi,phi] = AnalyticEqns(params,beacons,distances);
 
@@ -45,41 +46,46 @@ function pts = CircleIntersections(eqns, chi,phi, params)
                     pts{2,1}.sol1(1) > min(params.space.x) &&...
                     pts{2,1}.sol1(2) < max(params.space.y) &&...
                     pts{2,1}.sol1(2) > min(params.space.y) &&...
-                    norm(pts{2,1}.sol1 - pts{j,i}.sol1) < 5*mean(diff(params.space.x))
+                    norm(pts{2,1}.sol1 - pts{j,i}.sol1) < 2*mean(diff(params.space.x))
                         pts{i,j} = pts{j,i}.sol1;
             elseif  pts{2,1}.sol2(1) < max(params.space.x) &&...
                     pts{2,1}.sol2(1) > min(params.space.x) &&...
                     pts{2,1}.sol2(2) < max(params.space.y) &&...
                     pts{2,1}.sol2(2) > min(params.space.y) &&...
-                    norm(pts{2,1}.sol2 - pts{j,i}.sol2) < 5*mean(diff(params.space.x))
+                    norm(pts{2,1}.sol2 - pts{j,i}.sol2) < 2*mean(diff(params.space.x))
                         pts{i,j} = pts{j,i}.sol2;
             elseif  pts{2,1}.sol1(1) < max(params.space.x) &&...
                     pts{2,1}.sol1(1) > min(params.space.x) &&...
                     pts{2,1}.sol1(2) < max(params.space.y) &&...
                     pts{2,1}.sol1(2) > min(params.space.y) &&...
-                    norm(pts{2,1}.sol1 - pts{j,i}.sol2) < 5*mean(diff(params.space.x))
+                    norm(pts{2,1}.sol1 - pts{j,i}.sol2) < 2*mean(diff(params.space.x))
                         pts{i,j} = pts{j,i}.sol2;
             elseif  pts{2,1}.sol2(1) < max(params.space.x) &&...
                     pts{2,1}.sol2(1) > min(params.space.x) &&...
                     pts{2,1}.sol2(2) < max(params.space.y) &&...
                     pts{2,1}.sol2(2) > min(params.space.y) &&...
-                    norm(pts{2,1}.sol2 - pts{j,i}.sol1) < 5*mean(diff(params.space.x))
+                    norm(pts{2,1}.sol2 - pts{j,i}.sol1) < 2*mean(diff(params.space.x))
                         pts{i,j} = pts{j,i}.sol1;
+            else
+                        pts{i,j} = NaN;
             end
         end
     end
 end
 
 function AcquiredIntersecrionPoint = intersecionMean(pts)
-%calculates the position of point based on numbers of circle intersections
+%calculates the position of POI based on numbers of circle intersections
     AcquiredIntersecrionPoint.x = 0;
     AcquiredIntersecrionPoint.y = 0;
     k = 0;
     for i = 1:size(pts)
         for j = i+1:size(pts)
-            AcquiredIntersecrionPoint.x = AcquiredIntersecrionPoint.x + pts{i,j}(1);
-            AcquiredIntersecrionPoint.y = AcquiredIntersecrionPoint.y + pts{i,j}(2);
-            k = k + 1;
+            if isnan(pts{i,j})
+            else
+                AcquiredIntersecrionPoint.x = AcquiredIntersecrionPoint.x + pts{i,j}(1);
+                AcquiredIntersecrionPoint.y = AcquiredIntersecrionPoint.y + pts{i,j}(2);
+                k = k + 1;
+            end
         end
     end
     AcquiredIntersecrionPoint.x = AcquiredIntersecrionPoint.x / k;

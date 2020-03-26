@@ -1,30 +1,41 @@
 [params, beacons, dTR, dTRnoised, roverInitPosition] = ...
-          ProblemInit(5, 2, 1500, 10);
+          ProblemInit(15, 2, 1500, 10);
 % PlotSpace(beacons,0,roverInitPosition,params)
 %% Method 1: an analytical solution, mean of coordinates of intersections of pairs of circles      
-roverAnalyAcq  = AnalyticalMetod(params,beacons,dTR);
+disp('      !!Analytical imtersectioins method')
+tic
+roverAnalyAcq  = AnalyticalMetod(params,beacons,dTRnoised);
+toc 
+errAnaly = CalcError(roverInitPosition, roverAnalyAcq);
+disp(['distance between acquired and original = ' num2str(errAnaly)])
 
 figure
 FinPlotSpace(beacons, 0, roverInitPosition, roverAnalyAcq, params)
 title('Method of Analytical Intersections')
 
-errAnaly = CalcError(roverInitPosition, roverAnalyAcq);
 %% Method 2: Trilaterating the position of the POI
-roverTrilatAcq  = TrilaterationMethod(params,beacons,dTR);
+disp('      !!Trilateration method')
+tic
+roverTrilatAcq  = TrilaterationMethod(params,beacons,dTRnoised);
+toc
+errTrilat = CalcError(roverInitPosition, roverTrilatAcq);
+disp(['distance between acquired and original = ' num2str(errTrilat)])
 
 figure
 FinPlotSpace(beacons, 0, roverInitPosition, roverTrilatAcq, params)
 title('Trilateration Method')
 
-errTrilat = CalcError(roverInitPosition, roverTrilatAcq);
 %% Method 3: fmincon. Approaching the solution with the gradient descent
-roverFmincon  = GDescFmincon(params,beacons,dTR);
+disp('      !!fmincon method')
+tic
+roverFmincon  = GDescFmincon(params,beacons,dTRnoised);
+toc
+errGDesc = CalcError(roverInitPosition, roverFmincon);
+disp(['distance between acquired and original = ' num2str(errGDesc)])
 
 figure
 FinPlotSpace(beacons, 0, roverInitPosition, roverFmincon, params)
 title('Gradient Descent Method')
-
-errGDesc = CalcError(roverInitPosition, roverFmincon);
 %% GP Functions
 function FinPlotSpace(beacons,circles,roverInit,roverCalc,params)
 %plots the original POI and calculated one.
