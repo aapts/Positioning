@@ -21,6 +21,11 @@ function [params, beacon, distToRover, noisedDistToRover, roverInitPosition, see
 %   noisedDistTiRover - an array of distances with an added noise.
 %   
 %   roverInitPosition - an original position of a point of interest.
+%   anchQty - sets up the quantity of anchors,
+%   probDim - sets up the dimention of the problem: 2 or 3,
+%   gridDensity - 1/density is the minimal distance between 2 adjacent beacons,
+%   noiseAmp - regulates the amplitude of noise. if noiseAmp = 0, dTRnoised =
+%   dTR
 
 %%   setting up the space and the initial POI position  
 params.anchorQuantity = anchQty;
