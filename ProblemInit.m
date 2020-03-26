@@ -44,8 +44,10 @@ end
 distToRover = zeros(1,params.anchorQuantity);
 noisedDistToRover = distToRover;
 beacon = zeros(params.anchorQuantity,params.problemDim);
+% to reproduce random values, seedNoise and rndms are ought to be exported from function's workspace
 seedNoise = rng(1);
 rndms = RandomSet(seedNoise);
+%
 %% setting up anchors, calculating the distance, adding noise
 seedAnchs = rng('default');
 if params.problemDim == 2
