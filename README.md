@@ -23,6 +23,7 @@ calculates the total error of the calculated position of POI's.
 
 There are 3 methods avaliable to solve the problem: Analytical Intersections, Trilateration, Gradient Descent. 
 Method 1, analytical: 
+
           function roverCalcPosition = AnalyticalMetod(params,beacons,distances)
           %Analytical method of determinig the position of the POI. The equations of
           %circles with a center at each beacon and a radius of the distance between every
@@ -34,4 +35,10 @@ Method 1, analytical:
           %intersection of circles around first two beacons (placed in the corners of the
           %bound area)
           %
-          %method works only if the dimension of a problem is == 2
+          %method works only if the dimension of a problem is == 2         
+          
+Method 2, trilateration: 
+This method is similar to analytical, except here the values of intersection points are calculated numerically.
+         
+          function roverCalcPosition = TrilaterationMethod(params,beacons,distances)
+          %the most frequent intersection point is assumed to be the POI
