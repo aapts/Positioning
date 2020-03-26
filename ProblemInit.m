@@ -110,7 +110,11 @@ end
 function noised = AddNoise(dist, randomSet, fineness)
 %fineness regulates an amplitude of the noise. 10 would set an amplitude of a
 %magnitude of 10^-4 ... 10^-3
-    noised = dist + randomSet(randi(numel(randomSet)))./fineness;
+    if fineness == 0
+        noised = dist
+    else
+        noised = dist + randomSet(randi(numel(randomSet)))./fineness;
+    end
 end
 
 function rndSet = RandomSet(seed)
