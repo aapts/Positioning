@@ -1,7 +1,12 @@
 function roverCalcPosition = TrilaterationMethod(params,beacons,distances)
 %Trilateration method of determinig the position of the POI. Uses points and
 %distances
+%the most frequent intersection point is assumed to be the POI
 %
+%for each three beacons, the method applies linear transformation of the cartesian coordinates in such a way,
+%that one beacon becomes (0,0,0) of the new coordinate system, and the second beacon  lies on an X axis.
+%then, the position of the POI is calculated according to formulas provided here: https://en.wikipedia.org/wiki/True_range_multilateration
+%the final step is inverse transformation, to return to the original coordinate system.
 %https://en.wikipedia.org/wiki/True_range_multilateration#Three_Cartesian_dimensions,_three_measured_slant_ranges
 %% allocating memory for variables
 l = 0;
