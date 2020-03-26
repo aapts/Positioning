@@ -1,5 +1,5 @@
-function [params, beacon, distToRover, noisedDistToRover, roverInitPosition] = ...
-          ProblemInit(anchQty, probDim, gridDensity, noiseAmp)
+function [params, beacon, distToRover, noisedDistToRover, roverInitPosition, seed] ...
+        =    ProblemInit(anchQty, probDim, gridDensity, noiseAmp)
 %ProblemInit sets up the problem of a point(rover) in a probDim space.
 %The given parameters are a set of anchors with their coordinates and distances
 %to said anchors. Anchors are palced on a grid with coordinates -10...10 with a
@@ -100,6 +100,10 @@ elseif params.problemDim == 3
     end
 else
     error('Error. Set the dimension of a problem at 2 or 3.');
+end
+if nargout == 6
+    seed.seedNoise = seedNoise;
+    seed.rndms = rndms;
 end
 end
 
