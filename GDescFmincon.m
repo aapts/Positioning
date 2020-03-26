@@ -1,9 +1,9 @@
 function calcPosition = GDescFmincon(params,beacons,distances, startPt)
 %Determining the position of POI with MATLAB's fmincon.m 
-%We search such a new point (xn yn), that the diff of sq distances between it an
-%every anchor would ce as close as possible to the original known distances.
-%To evaluate such a point, we create a functional vector withh differences of
-%distances between points and anchors. 
+%We search such a new point (xn yn), that the diff of sq distances between 
+%(xn yn) and every anchor would be as close as possible to the original known 
+%distances. To evaluate such a point, we create a functional vector with 
+%differences of distances between points and anchors. 
 %
 %functin accepts the struct of problem aprameters, an array of beacons and the
 %array of original known distances. optional: define the start point of the
