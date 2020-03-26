@@ -7,7 +7,7 @@ function calcPosition = GDescFmincon(params,beacons,distances, startPt)
 %
 %functin accepts the struct of problem aprameters, an array of beacons and the
 %array of original known distances. optional: define the start point of the
-%minimizer wsearch
+%minimizer search. If not passed to the function, defaults to [0 0]
 
 syms gfx(x,y) [1 params.anchorQuantity]
 for i = 1:params.anchorQuantity
