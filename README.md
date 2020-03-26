@@ -54,6 +54,7 @@ Method 3, gradient descent using fmincon():
 Method reiles on the convergense of an approacing point with the real solution.
 Functional is set to be the norm of vector, composed of distances between the approaching point
 and the real POI. 
+
           function calcPosition = GDescFmincon(params,beacons,distances, startPt)
           %Determining the position of POI with MATLAB's fmincon.m 
           %We search such a new point (xn yn), that the diff of sq distances between 
