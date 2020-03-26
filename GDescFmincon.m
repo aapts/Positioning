@@ -10,16 +10,16 @@ function calcPosition = GDescFmincon(params,beacons,distances, startPt)
 %optional: define the start point of the minimizer search. 
 %If not passed to the function, defaults to [0 0]
 
-syms gfx(x,y) [1 params.anchorQuantity]
+syms distToSolution(x,y) [1 params.anchorQuantity]
 for i = 1:params.anchorQuantity
     %creating functional, the difference of squares of  distances
     bx = beacons(i,1);
     by = beacons(i,2);
     dst= distances(i);
-    eval(['gfx', num2str(i), '(x,y) = (bx - x)^2 + (by - y)^2 - dst^2;']);
+    eval(['distToSolution', num2str(i), '(x,y) = (bx - x)^2 + (by - y)^2 - dst^2;']);
 end
 
-fun = subs(gfx);
+fun = subs(distToSolution);
 
 %minimizing the norm of the vector of differences of squared distances leads
 %to the minimal distance between the true solution and the acquired one
