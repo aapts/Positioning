@@ -18,7 +18,13 @@ title('Trilateration Method')
 
 errTrilat = CalcError(roverInitPosition, roverTrilatAcq);
 %% Method 3: fmincon. Approaching the solution with the gradient descent
+roverFmincon  = GDescFmincon(params,beacons,dTR);
 
+figure
+FinPlotSpace(beacons, 0, roverInitPosition, roverFmincon, params)
+title('Gradient Descent Method')
+
+errGDesc = CalcError(roverInitPosition, roverFmincon);
 %% GP Functions
 function FinPlotSpace(beacons,circles,roverInit,roverCalc,params)
 %plots the original POI and calculated one.
