@@ -5,9 +5,10 @@ function calcPosition = GDescFmincon(params,beacons,distances, startPt)
 %distances. To evaluate such a point, we create a functional vector with 
 %differences of distances between points and anchors. 
 %
-%functin accepts the struct of problem aprameters, an array of beacons and the
-%array of original known distances. optional: define the start point of the
-%minimizer search. If not passed to the function, defaults to [0 0]
+%function accepts the struct field of problem parameters, an array of beacons and the
+%array of original known distances. 
+%optional: define the start point of the minimizer search. 
+%If not passed to the function, defaults to [0 0]
 
 syms gfx(x,y) [1 params.anchorQuantity]
 for i = 1:params.anchorQuantity
