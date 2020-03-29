@@ -9,9 +9,9 @@ toc
 errAnaly = CalcError(roverInitPosition, roverAnalyAcq);
 disp(['distance between acquired and original = ' num2str(errAnaly)])
 
-% figure
-% FinPlotSpace(beacons, 0, roverInitPosition, roverAnalyAcq, params)
-% title('Method of Analytical Intersections')
+figure
+FinPlotSpace(beacons, 0, roverInitPosition, roverAnalyAcq, params)
+title('Method of Analytical Intersections')
 %% Method 2: Trilaterating the position of the POI
 disp('      !!Trilateration method')
 tic
@@ -20,9 +20,9 @@ toc
 errTrilat = CalcError(roverInitPosition, roverTrilatAcq);
 disp(['distance between acquired and original = ' num2str(errTrilat)])
 
-% figure
-% FinPlotSpace(beacons, 0, roverInitPosition, roverTrilatAcq, params)
-% title('Trilateration Method')
+figure
+FinPlotSpace(beacons, 0, roverInitPosition, roverTrilatAcq, params)
+title('Trilateration Method')
 %% Method 3: fmincon. Approaching the solution with the gradient descent
 disp('      !!fmincon method')
 tic
@@ -31,9 +31,9 @@ toc
 errGDesc = CalcError(roverInitPosition, roverFmincon);
 disp(['distance between acquired and original = ' num2str(errGDesc)])
 
-% figure
-% FinPlotSpace(beacons, 0, roverInitPosition, roverFmincon, params)
-% title('Gradient Descent Method')
+figure
+FinPlotSpace(beacons, 0, roverInitPosition, roverFmincon, params)
+title('Gradient Descent Method')
 %% GP Functions
 function FinPlotSpace(beacons,circles,roverInit,roverCalc,params)
 %plots the original POI and calculated one.
