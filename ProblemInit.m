@@ -98,6 +98,22 @@ elseif params.problemDim == 3
     beacon(4,1) = max(params.space.x);
     beacon(4,2) = min(params.space.y);
     beacon(4,3) = min(params.space.z);
+    
+    beacon(5,1) = min(params.space.x);
+    beacon(5,2) = min(params.space.y);
+    beacon(5,3) = max(params.space.z);
+    
+    beacon(6,1) = min(params.space.x);
+    beacon(6,2) = max(params.space.y);
+    beacon(6,3) = max(params.space.z);
+    
+    beacon(7,1) = max(params.space.x);
+    beacon(7,2) = max(params.space.y);
+    beacon(7,3) = max(params.space.z); 
+    
+    beacon(8,1) = max(params.space.x);
+    beacon(8,2) = min(params.space.y);
+    beacon(8,3) = max(params.space.z);
     for i = 1:params.anchorQuantity
         distToRover(i) = norm ([roverInitPosition.x;roverInitPosition.y;roverInitPosition.z] - ...
                                [beacon(i,1);beacon(i,2);beacon(i,3)]);
@@ -106,6 +122,7 @@ elseif params.problemDim == 3
 else
     error('Error. Set the dimension of a problem at 2 or 3.');
 end
+params.anchorQuantity = length(beacon);
 if nargout == 6
     seed.seedNoise = seedNoise;
     seed.rndms = rndms;

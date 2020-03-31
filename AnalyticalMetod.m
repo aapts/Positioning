@@ -17,7 +17,12 @@ if params.problemDim == 2
     ptsIntersection = CircleIntersections(eqns, chi, phi, params);
     roverCalcPosition = intersecionMean(ptsIntersection);
 else
-    error('Error. The method can only be used with params.problemDim = 2');
+    disp('//!Error. The method can only be used with params.problemDim = 2');
+    disp('//!Returning point [0 0 0]');
+    roverCalcPosition.x = 0;
+    roverCalcPosition.y = 0;
+    roverCalcPosition.z = 0;
+    return
 end
 end
 %% Method 1 Functions

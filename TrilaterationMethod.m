@@ -31,6 +31,7 @@ end
 trilat.Points = rmmissing(trilat.Points,2);
 roverCalcPosition.x = mode(trilat.Points(1,:));
 roverCalcPosition.y = mode(trilat.Points(2,:));
+roverCalcPosition.z = mode(trilat.Points(3,:));
 %% Method 2 Functions
 function [P1, P2, P3] = TrilatInit(i,j,k, beacon)
 %settup of the matrix of three beacons
