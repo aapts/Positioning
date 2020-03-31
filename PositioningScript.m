@@ -3,7 +3,7 @@
 % PlotSpace(beacons,0,roverInitPosition,params) %uncomment to plot the original space
 %% Method 1: an analytical solution, mean of coordinates of intersections of pairs of circles      
 if params.problemDim == 2
-    disp('      !!Analytical imtersectioins method')
+    disp('      !!Analytical intersectioins method')
     tic
     roverAnalyAcq  = AnalyticalMetod(params,beacons,dTRnoised);
     toc 
