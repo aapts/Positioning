@@ -1,5 +1,5 @@
 [params, beacons, dTR, dTRnoised, roverInitPosition] = ...
-          ProblemInit(10, 2, 1500, 10); 
+          ProblemInit(7, 3, 1500, 10); 
 % PlotSpace(beacons,0,roverInitPosition,params) %uncomment to plot the original space
 %% Method 1: an analytical solution, mean of coordinates of intersections of pairs of circles      
 if params.problemDim == 2
@@ -75,7 +75,6 @@ function PlotSpace(beacons,circles,roverInit,params)
     ylabel('\phi');
   end
 if circles == 0
-    return
 else
     fimplicit(circles(:), [min(params.space.x) max(params.space.x)]);
 end
