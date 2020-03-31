@@ -1,5 +1,5 @@
-[params, beacons, dTR, dTRnoised, roverInitPosition, sd] = ...
-          ProblemInit(5, 2, 1500, 0); 
+[params, beacons, dTR, dTRnoised, roverInitPosition] = ...
+          ProblemInit(20, 2, 1500, 10); 
 % PlotSpace(beacons,0,roverInitPosition,params) %uncomment to plot the original space
 %% Method 1: an analytical solution, mean of coordinates of intersections of pairs of circles      
 disp('      !!Analytical imtersectioins method')
