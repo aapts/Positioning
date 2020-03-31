@@ -12,8 +12,12 @@ function [params, beacon, distToRover, noisedDistToRover, roverInitPosition, see
 %
 %   beacon - an array of coordinates of anchors. Beacons are placed randomly on
 %   the grid
-%       [1, 1] [1, 2] [1, 3] - set of coordinates of the 1st anchor
-%       the first 4 beacons are placed in corners of the grid
+%   beacons are placed in every corner of the space. If user inputs amount N less
+%   than amount of corners, program interprets it as "add N additional beacons".
+%   example: probDim == 3; anchQty == 2. Program will generate 10 points: 8 in
+%   corners and 2 additional.
+%   example: probDim == 2; anchQty == 15. program will generate 15 points with 4
+%   in corners
 %   
 %   distToRover - an array of distances between every anchor and the point of
 %   interest
@@ -28,7 +32,16 @@ function [params, beacon, distToRover, noisedDistToRover, roverInitPosition, see
 %   dTR
 
 %%   setting up the space and the initial POI position  
-params.anchorQuantity = anchQty;
+if probDim == 2 && anchQty < 4
+    params.anchorQuantity = anchQty + 4;
+elseif probDim == 2 && anchQty >= 4
+    params.anchorQuantity = anchQty;
+elseif probDim == 3 && anchQty < 8
+    params.anchorQuantity = anchQty + 8;
+elseif probDim == 3 && anchQty >= 8
+    params.anchorQuantity = anchQty
+end
+   
 params.problemDim = probDim;
 params.spaceFineness = gridDensity; %a density of the grid we place anchors and the POI on
 
@@ -122,7 +135,6 @@ elseif params.problemDim == 3
 else
     error('Error. Set the dimension of a problem at 2 or 3.');
 end
-params.anchorQuantity = length(beacon);
 if nargout == 6
     seed.seedNoise = seedNoise;
     seed.rndms = rndms;
