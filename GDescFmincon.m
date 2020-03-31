@@ -10,19 +10,19 @@ function calcPosition = GDescFmincon(params,beacons,distances, startPt)
 %optional: define the start point of the minimizer search. 
 %If not passed to the function, defaults to [0 0]
 
-%minimizing the norm of the vector of differences of squared distances leads
-%to the minimal distance between the true solution and the acquired one
 toMinimize = @(x) erfun(beacons, distances, x);
+
 A = [];     b = [];
 Aeq = [];   beq= [];   
 lowBound = [min(params.space.x), min(params.space.y), min(params.space.z)];
 uppBound = [max(params.space.x), max(params.space.y), max(params.space.z)];
 options = optimoptions('fmincon','Display','off');
+
 if nargin == 3
     startPt = [0,0,0];
 end
-endPt = fmincon(toMinimize,startPt,A,b,Aeq,beq,lowBound,uppBound,[],options);
 
+endPt = fmincon(toMinimize,startPt,A,b,Aeq,beq,lowBound,uppBound,[],options);
 calcPosition.x = endPt(1);
 calcPosition.y = endPt(2);
 calcPosition.z = endPt(3);
@@ -38,6 +38,7 @@ function out = erfun(beacons, distances, x)
     db = dbx.^2 + dby.^2 + dbz.^2;
     
     dst_sq = distances.^2;
-    
+%minimizing the norm of the vector of differences of squared distances leads
+%to the minimal distance between the true solution and the acquired one
     out(:) = norm(db(:) - dst_sq(:));
 end
